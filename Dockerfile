@@ -110,7 +110,7 @@ FROM debian:stable-slim
 COPY --from=builder /build/bin/bitcoind /bin
 COPY --from=builder /build/bin/bitcoin-cli /bin
 
-ENV HOME /data
+ENV HOME=/data
 VOLUME /data/.bitcoin
 
 EXPOSE 8332 8333 18332 18333 18443 18444
