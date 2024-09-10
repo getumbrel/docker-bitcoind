@@ -1,11 +1,5 @@
 # docker-bitcoind
 
-[![Docker Pulls](https://badgen.net/docker/pulls/lukechilds/bitcoind?icon=docker&label=Docker%20pulls)](https://hub.docker.com/r/lukechilds/bitcoind/)
-[![Docker Image Size](https://badgen.net/docker/size/lukechilds/bitcoind/latest/amd64?icon=docker&label=lukechilds/bitcoind)](https://hub.docker.com/r/lukechilds/bitcoind/tags?name=latest)
-[![GitHub Donate](https://badgen.net/badge/GitHub/Sponsor/D959A7?icon=github)](https://github.com/sponsors/lukechilds)
-[![Bitcoin Donate](https://badgen.net/badge/Bitcoin/Donate/F19537?icon=bitcoin)](https://lu.ke/tip/bitcoin)
-[![Lightning Donate](https://badgen.net/badge/Lightning/Donate/F6BC41?icon=bitcoin-lightning)](https://lu.ke/tip/lightning)
-
 > Run a full Bitcoin node with one command
 
 A Docker configuration with sane defaults for running a full Bitcoin node.
@@ -13,7 +7,13 @@ A Docker configuration with sane defaults for running a full Bitcoin node.
 ## Usage
 
 ```
-docker run --name bitcoind -v $HOME/.bitcoin:/data/.bitcoin -p 8333:8333 lukechilds/bitcoind
+docker run --name bitcoind -v $HOME/.bitcoin:/data/.bitcoin -p 8333:8333 getumbrel/bitcoind:<version-tag>
+```
+
+Replace the tag `<version-tag>` with the available version that you want to run. For example, to run version 27.1, use the tag `v27.1`:
+
+```
+docker run --name bitcoind -v $HOME/.bitcoin:/data/.bitcoin -p 8333:8333 getumbrel/bitcoind:v27.1
 ```
 
 ### JSON-RPC
@@ -30,7 +30,7 @@ To access JSON-RPC from other services you'll also need to expose port 8332. You
 docker run --name bitcoind -v $HOME/.bitcoin:/data/.bitcoin \
   -p 8333:8333 \
   -p 127.0.0.1:8332:8332 \
-  lukechilds/bitcoind
+  getumbrel/bitcoind:v27.1
 ```
 
 You could now query JSON-RPC via cURL like so:
@@ -50,59 +50,47 @@ You can use this to configure via CLI args without a config file:
 docker run --name bitcoind -v $HOME/.bitcoin:/data/.bitcoin \
   -p 8333:8333 \
   -p 127.0.0.1:8332:8332 \
-  lukechilds/bitcoind -rpcuser=jonsnow -rpcpassword=ikn0wnothin
+  getumbrel/bitcoind:v27.1 -rpcuser=jonsnow -rpcpassword=ikn0wnothin
 ```
 
 Or just use the container like a bitcoind binary:
 
 ```
-$ docker run lukechilds/bitcoind -version
-Bitcoin Core Daemon version v0.18.1
-Copyright (C) 2009-2019 The Bitcoin Core developers
+$ docker run getumbrel/bitcoind:v27.1 -version
+Bitcoin Core RPC client version v27.1.0
+Copyright (C) 2009-2024 The Bitcoin Core developers
 
 Please contribute if you find Bitcoin Core useful. Visit
-<https://bitcoincore.org> for further information about the software.
+<https://bitcoincore.org/> for further information about the software.
 The source code is available from <https://github.com/bitcoin/bitcoin>.
 
 This is experimental software.
 Distributed under the MIT software license, see the accompanying file COPYING
 or <https://opensource.org/licenses/MIT>
-
-This product includes software developed by the OpenSSL Project for use in the
-OpenSSL Toolkit <https://www.openssl.org> and cryptographic software written by
-Eric Young and UPnP software written by Thomas Bernard.
 ```
 
-### Version
+### Versions
 
-Run a specific version of bitcoind if you want.
+Images for versions starting from v27.1 are available. To run a specific available version, use the appropriate tag.
 
 ```
-docker run --name bitcoind -v $HOME/.bitcoin:/data/.bitcoin -p 8333:8333 lukechilds/bitcoind:v0.18.1
+docker run --name bitcoind -v $HOME/.bitcoin:/data/.bitcoin -p 8333:8333 getumbrel/bitcoind:v27.1
 ```
 
 ## Build
 
-Build this image yourself by checking out this repo, `cd` ing into it and running:
+A multi-architecture (amd64 and arm64) image is automatically built and published to Docker Hub when new tags are pushed in the format `v*.*.*` (e.g., `v25.0.0`).
+
+If you want to build this image yourself, check out this repo, `cd` into it, and run:
 
 ```
-docker build -t lukechilds/bitcoind .
+docker buildx build --platform linux/amd64,linux/arm64 --build-arg VERSION=<version> -t <image_name>:<tag> --push .
 ```
 
-You can build a specific version by passing in the `VERSION` build arg:
+Replace `<version>` with the Bitcoin Core version you're building (without the 'v' prefix), and `<image_name>:<tag>` with your desired image name and tag.
 
-```
-docker build --build-arg VERSION=0.18.1 -t lukechilds/bitcoind:v0.18.1 .
-```
-
-You can build a specific architecture by passing in the `ARCH` build arg:
-
-```
-docker build --build-arg ARCH=amd64 -t lukechilds/bitcoind:amd64 .
-```
-
-For a full list of supported build arg options, check out the [build script matrix](https://github.com/lukechilds/docker-bitcoind/blob/master/.github/workflows/build.yml).
+The Dockerfile supports `linux/amd64` and `linux/arm64` architectures only.
 
 ## License
 
-MIT © Luke Childs
+MIT © Umbrel, Inc. https://getumbrel.com/
