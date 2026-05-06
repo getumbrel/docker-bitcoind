@@ -71,7 +71,7 @@ or <https://opensource.org/licenses/MIT>
 
 ### Multiprocess IPC
 
-Bitcoin Core v30.0 and newer images also include the upstream `bitcoin` wrapper and `bitcoin-node` helper used by Bitcoin Core's multiprocess IPC mode. The default entrypoint remains `bitcoind`, so normal usage is unchanged.
+Bitcoin Core v30.2 and newer images also include the upstream `bitcoin` wrapper and `bitcoin-node` helper used by Bitcoin Core's multiprocess IPC mode. The default entrypoint remains `bitcoind`, so normal usage is unchanged.
 
 If you need multiprocess mode, override the entrypoint:
 
