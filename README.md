@@ -69,6 +69,18 @@ Distributed under the MIT software license, see the accompanying file COPYING
 or <https://opensource.org/licenses/MIT>
 ```
 
+### Multiprocess IPC
+
+Bitcoin Core v30.0 and newer images also include the upstream `bitcoin` wrapper and `bitcoin-node` helper used by Bitcoin Core's multiprocess IPC mode. The default entrypoint remains `bitcoind`, so normal usage is unchanged.
+
+If you need multiprocess mode, override the entrypoint:
+
+```
+docker run --name bitcoind -v $HOME/.bitcoin:/data/.bitcoin \
+  --entrypoint bitcoin \
+  getumbrel/bitcoind:v30.2 -m node -ipcbind=unix
+```
+
 ### Versions
 
 Images for versions starting from v27.1 are available. To run a specific available version, use the appropriate tag.

@@ -104,11 +104,31 @@ RUN echo "Checksums verified ok"
 RUN echo "Extracting release assets"
 RUN tar -zxvf $(cat /tarball-name) --strip-components=1
 
+# Bitcoin Core v30+ ships multiprocess IPC binaries. Require them for v30+
+# builds so we do not publish an image that appears IPC-capable but is not.
+# In this Debian image /bin resolves through /usr, so /bin/bitcoin expects
+# its multiprocess helper at /usr/bin/bitcoin-node.
+# Stage the selected runtime files under /runtime first so the final image can
+# copy a small, explicit file set while this builder stage handles version
+# differences.
+RUN echo "Preparing runtime files" && \
+    mkdir -p /runtime/bin /runtime/usr/bin && \
+    cp /build/bin/bitcoind /runtime/bin/ && \
+    cp /build/bin/bitcoin-cli /runtime/bin/ && \
+    version_major="${VERSION%%.*}" && \
+    if [ "${version_major}" -ge 30 ]; then \
+      cp /build/bin/bitcoin /runtime/bin/ && \
+      cp /build/libexec/bitcoin-node /runtime/usr/bin/; \
+    else \
+      if [ -f /build/bin/bitcoin ]; then cp /build/bin/bitcoin /runtime/bin/; fi && \
+      if [ -f /build/libexec/bitcoin-node ]; then cp /build/libexec/bitcoin-node /runtime/usr/bin/; fi; \
+    fi
+
 # Final image
 FROM debian:stable-slim
 
-COPY --from=builder /build/bin/bitcoind /bin
-COPY --from=builder /build/bin/bitcoin-cli /bin
+COPY --from=builder /runtime/bin/ /bin/
+COPY --from=builder /runtime/usr/bin/ /usr/bin/
 
 ENV HOME=/data
 VOLUME /data/.bitcoin
